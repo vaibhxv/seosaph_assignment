@@ -21,22 +21,22 @@ const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`https://seosaph-assignment.onrender.com/api/users?page=${page}&filter=${filter}`);
-      setUsers(res.data.users);
-      setTotal(res.data.total);
-    } catch (err) {
-      console.error('Error fetching users:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, filter]);
-
+  // Fetch users on initial load
   useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`http://localhost:8989/api/users?page=${page}`);
+        setUsers(res.data.users);
+        setTotal(res.data.total);
+      } catch (err) {
+        console.error('Error fetching users:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchUsers();
-  }, [fetchUsers]);
+  }, [page]);
 
   useEffect(() => {
     const userId = new URLSearchParams(location.search).get('userId');
@@ -48,7 +48,7 @@ const UserList = () => {
 
   const fetchUserDetails = async (id) => {
     try {
-      const res = await axios.get(`https://seosaph-assignment.onrender.com/api/users/${id}`);
+      const res = await axios.get(`http://localhost:8989/api/users/${id}`);
       setSelectedUser(res.data);
     } catch (err) {
       console.error('Error fetching user details:', err);
@@ -57,8 +57,8 @@ const UserList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://seosaph-assignment.onrender.com/api/users/${id}`);
-      fetchUsers();  // Refresh the list after deletion
+      await axios.delete(`http://localhost:8989/api/users/${id}`);
+      setUsers(users.filter(user => user._id !== id)); // Remove the deleted user from the list
     } catch (err) {
       console.error('Error deleting user:', err);
     }
@@ -81,108 +81,112 @@ const UserList = () => {
     setUsers(sortedUsers);
   };
 
+  // Filter users based on the search input
+  const filteredUsers = users.filter(user =>
+    user.username.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <>
-    <Nav />
-    <div className="flex flex-col items-center bg-gray-50 min-h-screen p-6">
-      {loading ? (
-        <>
-        <Spinner size="xl" className="m-8" />
-        <h3>Sometimes hosted backend service on Render.com can take upto 60seconds to load.</h3>
-        <h3>Thank You for being patient.</h3>
-        </>
-      ) : (
-        <Box className="w-full bg-white shadow-lg rounded-lg p-6 mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <Input
-            placeholder="Filter by username"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="w-full max-w-sm"
-          />
-          <Link to='/add-user'>
-            <Button colorScheme="teal" className="ml-4">+ Add User</Button>
-          </Link>
-        </div>
-        <TableContainer>
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th className="flex items-center">
-                  Username
-                  <IconButton
-                    aria-label="Sort Username"
-                    icon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                    size="sm"
-                    onClick={handleSortToggle}
-                    ml={2}
-                  />
-                </Th>
-                <Th>Email</Th>
-                <Th>Description</Th>
-                <Th>Actions</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {users.map(user => (
-                <Tr key={user._id}>
-                  <Td>{user.username}</Td>
-                  <Td>{user.email}</Td>
-                  <Td>{user.description.split(' ').slice(0, 5).join(' ')}{user.description.split(' ').length > 5 ? '...' : ''}</Td>
-                  <Td>
-                    <Button colorScheme="blue" onClick={() => handleViewDetails(user._id)} className="mr-2">View Details</Button>
-                    <Button colorScheme="red" onClick={() => handleDelete(user._id)}>Delete</Button>
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
-        <div className="flex justify-between items-center mt-6">
-          <button
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-            className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded"
-          >
-            Previous
-          </button>
-          <span className="text-lg">
-            Page {page} of {Math.ceil(total / 10)}
-          </span>
-          <button
-            onClick={() => setPage(page + 1)}
-            disabled={page * 10 >= total}
-            className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded"
-          >
-            Next
-          </button>
-        </div>
-      </Box>
-      )}
-     
+      <Nav />
+      <div className="flex flex-col items-center bg-gray-50 min-h-screen p-6">
+        {loading ? (
+          <>
+            <Spinner size="xl" className="m-8" />
+            <h3>Sometimes hosted backend service on Render.com can take up to 60 seconds to load.</h3>
+            <h3>Thank You for being patient.</h3>
+          </>
+        ) : (
+          <Box className="w-full bg-white shadow-lg rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center mb-6">
+              <Input
+                placeholder="Filter by username"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-full max-w-sm"
+              />
+              <Link to='/add-user'>
+                <Button colorScheme="teal" className="ml-4">+ Add User</Button>
+              </Link>
+            </div>
+            <TableContainer>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th className="flex items-center">
+                      Username
+                      <IconButton
+                        aria-label="Sort Username"
+                        icon={sortOrder === 'asc' ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                        size="sm"
+                        onClick={handleSortToggle}
+                        ml={2}
+                      />
+                    </Th>
+                    <Th>Email</Th>
+                    <Th>Description</Th>
+                    <Th>Actions</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {filteredUsers.map(user => (
+                    <Tr key={user._id}>
+                      <Td>{user.username}</Td>
+                      <Td>{user.email}</Td>
+                      <Td>{user.description.split(' ').slice(0, 5).join(' ')}{user.description.split(' ').length > 5 ? '...' : ''}</Td>
+                      <Td>
+                        <Button colorScheme="blue" onClick={() => handleViewDetails(user._id)} className="mr-2">View Details</Button>
+                        <Button colorScheme="red" onClick={() => handleDelete(user._id)}>Delete</Button>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+            <div className="flex justify-between items-center mt-6">
+              <button
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded"
+              >
+                Previous
+              </button>
+              <span className="text-lg">
+                Page {page} of {Math.ceil(total / 10)}
+              </span>
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={page * 10 >= total}
+                className="bg-gray-500 text-white hover:bg-gray-600 px-4 py-2 rounded"
+              >
+                Next
+              </button>
+            </div>
+          </Box>
+        )}
 
-      {/* User Details Modal */}
-      {selectedUser && (
-         <Modal isOpen={isOpen} onClose={() => { onClose(); setSelectedUser(null); navigate('/'); }}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{selectedUser.username}'s Details</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <div className="space-y-2">
-                <p><strong>Email:</strong> {selectedUser.email}</p>
-                <p><strong>Description:</strong> {selectedUser.description}</p>
-                <p><strong>Role:</strong> {selectedUser.role}</p>
-                <p><strong>Registered On:</strong> {new Date(selectedUser.registrationDate).toLocaleDateString()}</p>
-              </div>
-            </ModalBody>
-            <ModalFooter>
-              
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-    </div>
+        {/* User Details Modal */}
+        {selectedUser && (
+          <Modal isOpen={isOpen} onClose={() => { onClose(); setSelectedUser(null); navigate('/'); }}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>{selectedUser.username}'s Details</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <div className="space-y-2">
+                  <p><strong>Email:</strong> {selectedUser.email}</p>
+                  <p><strong>Description:</strong> {selectedUser.description}</p>
+                  <p><strong>Role:</strong> {selectedUser.role}</p>
+                  <p><strong>Registered On:</strong> {new Date(selectedUser.registrationDate).toLocaleDateString()}</p>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button colorScheme="blue" onClick={() => { onClose(); setSelectedUser(null); navigate('/'); }}>Close</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        )}
+      </div>
     </>
   );
 };
