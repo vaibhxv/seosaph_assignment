@@ -163,7 +163,7 @@ const UserList = () => {
 
       {/* User Details Modal */}
       {selectedUser && (
-        <Modal isOpen={isOpen} onClose={() => { onClose(); navigate('/'); }}>
+         <Modal isOpen={isOpen} onClose={() => { onClose(); setSelectedUser(null); navigate('/'); }}>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>{selectedUser.username}'s Details</ModalHeader>
@@ -177,7 +177,7 @@ const UserList = () => {
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="blue" onClick={() => { onClose(); navigate('/'); }}>Back</Button>
+              
             </ModalFooter>
           </ModalContent>
         </Modal>
