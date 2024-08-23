@@ -24,7 +24,7 @@ const AddUser = () => {
     }
 
     try {
-      await axios.post('http://localhost:8989/api/users', { username, email, description, role });
+      await axios.post('https://seosaph-assignment.onrender.com/api/users', { username, email, description, role });
       navigate('/');  // Redirect to home page after adding user
     } catch (err) {
       setError('Error adding user.');
