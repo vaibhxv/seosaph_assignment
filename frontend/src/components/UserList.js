@@ -181,7 +181,7 @@ const UserList = () => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button colorScheme="blue" onClick={() => { onClose(); setSelectedUser(null); navigate('/'); }}>Close</Button>
+           
               </ModalFooter>
             </ModalContent>
           </Modal>
