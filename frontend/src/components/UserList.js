@@ -26,7 +26,7 @@ const UserList = () => {
     const fetchUsers = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:8989/api/users?page=${page}`);
+        const res = await axios.get(`https://seosaph-assignment.onrender.com/api/users?page=${page}`);
         setUsers(res.data.users);
         setTotal(res.data.total);
       } catch (err) {
@@ -48,7 +48,7 @@ const UserList = () => {
 
   const fetchUserDetails = async (id) => {
     try {
-      const res = await axios.get(`http://localhost:8989/api/users/${id}`);
+      const res = await axios.get(`https://seosaph-assignment.onrender.com/api/users/${id}`);
       setSelectedUser(res.data);
     } catch (err) {
       console.error('Error fetching user details:', err);
@@ -57,7 +57,7 @@ const UserList = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8989/api/users/${id}`);
+      await axios.delete(`https://seosaph-assignment.onrender.com/api/users/${id}`);
       setUsers(users.filter(user => user._id !== id)); // Remove the deleted user from the list
     } catch (err) {
       console.error('Error deleting user:', err);
