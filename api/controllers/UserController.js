@@ -1,4 +1,3 @@
-// controllers/userController.js
 const User = require('../models/User');
 
 // Get all users with pagination, filtering, and sorting
@@ -26,7 +25,7 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-// Get a specific user by ID
+
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -37,7 +36,7 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Add a new user
+
 exports.addUser = async (req, res) => {
   try {
     const { username, email, description, role } = req.body;
@@ -56,7 +55,7 @@ exports.addUser = async (req, res) => {
   }
 };
 
-// Delete a user by ID
+
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
