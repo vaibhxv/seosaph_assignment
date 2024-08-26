@@ -1,7 +1,4 @@
-// config/db.js
 
-// username - vaibhavrohaanbt19ece
-// pass - 2QkFVCxzcMZjnLsR
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
